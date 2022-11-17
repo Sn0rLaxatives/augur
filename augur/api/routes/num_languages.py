@@ -1,9 +1,5 @@
-import datetime
-import sqlalchemy as s
-import pandas as pd
-from augur.api.util import register_metric
-from augur.application.db.engine import engine
+def create_routes(app):
 
-@register_metric()
-def num_languages(repo_group_id, repo_id=None):
-  pass
+    @app.route('/{}/languages'.format(AUGUR_API_VERSION), methods=["GET"])
+    def num_languages():
+      pass
