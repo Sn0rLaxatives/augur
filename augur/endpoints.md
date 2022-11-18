@@ -8,3 +8,6 @@ commentIssues-endpoint-build branch in augur/api/metrics
 
 Number of downloads is located at:
 Downloads-endpoint-build branch in augur/api/routes
+
+Number of comment lines is located at:
+commentlines-endpoint-build branch in augur/api/metrics
