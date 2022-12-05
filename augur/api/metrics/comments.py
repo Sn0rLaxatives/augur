@@ -12,8 +12,8 @@ from augur.application.db.engine import create_database_engine
 engine = create_database_engine()
 
 @register_metric()
-def number_of_comment_lines():
-    """Returns total number of issues with comments
+def number_of_comment_lines(repo_group_id, repo_id=None, begin_date=None, end_date=None, period='month'):
+    """Returns the total number of comment lines in a repository
     :param repo_group_id: The repository's repo_group_id
     :param repo_id: The repository's repo_id, defaults to None
     :param period: To set the periodicity to 'day', 'week', 'month' or 'year', defaults to 'day'
