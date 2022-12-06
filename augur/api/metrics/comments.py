@@ -22,25 +22,37 @@ def number_of_comment_lines(repo_group_id, repo_id=None, begin_date=None, end_da
     :return: DataFrame number of total issues
     """
     if not begin_date:
-        begin_date = '1970-1-1 00:00:00'
+        begin_date = '1970-1-1 00:00:01'
     if not end_date:
         end_date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-    issues_new_SQL = ''
+    comment_lines_SQL = None
 
-    if not repo_id:
-        issues_new_SQL = s.sql.text("""
-        """)
-
-        results = pd.read_sql(issues_new_SQL, engine, params={'repo_group_id': repo_group_id, 'period': period,
-                                                               'begin_date': begin_date, 'end_date': end_date})
-
-        return results
-
+    if repo_id:
+        comment_lines_SQL = s.sql.text(
+            """
+        SELECT SUM(total_lines) AS nr_total_lines, SUM(code_lines) AS nr_code_lines, SUM(comment_lines) AS nr_comment_lines,
+            (SUM(code_lines) * 100 / NULLIF(CAST(SUM(total_lines) AS FLOAT), 0)) AS Percentage_of_code_lines, 
+            (SUM(comment_lines) * 100 / NULLIF(CAST(SUM(total_lines) AS FLOAT), 0)) AS Percentage_of_comment_lines  
+        FROM augur_data.repo_labor
+        WHERE repo_id = 1
+            AND rl_analysis_date BETWEEN '1970-1-1 00:00:01' AND '2022-06-06 00:00:01';
+            """
+        )
     else:
-        issues_new_SQL = s.sql.text("""
-        """)
+        comment_lines_SQL = s.sql.text(
+            """
+         SELECT SUM(total_lines) AS nr_total_lines, SUM(code_lines) AS nr_code_lines, SUM(comment_lines) AS nr_comment_lines,
+        (SUM(code_lines) * 100 / NULLIF(CAST(SUM(total_lines) AS FLOAT), 0)) AS Percentage_of_code_lines, 
+        (SUM(comment_lines) * 100 / NULLIF(CAST(SUM(total_lines) AS FLOAT), 0)) AS Percentage_of_comment_lines  
+            FROM augur_data.repo_labor AS A, augur_data.repo AS B 
+            WHERE A.repo_id = B.repo_id
+                AND B.repo_group_id = :repo_group_id
+                AND rl_analysis_date BETWEEN :begin_date AND :end_date;           
+            """
+        )
 
-        results = pd.read_sql(issues_new_SQL, engine, params={'repo_id': repo_id, 'period': period,
-                                                               'begin_date': begin_date, 'end_date': end_date})
-        return results
+    results = pd.read_sql(comment_lines_SQL, engine, params={'repo_id': repo_id, 
+        'repo_group_id': repo_group_id,'begin_date': begin_date, 'end_date': end_date, 'period':period})
+
+    return results
