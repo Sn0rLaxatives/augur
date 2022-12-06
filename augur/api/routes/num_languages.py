@@ -4,8 +4,6 @@ def create_routes(app):
     def num_languages():
       num_of_languages_sql = s.sql.text("""
             SELECT COUNT ( DISTINCT programming_language ) AS "Number of Languages"
-                programming_language,
-                COUNT ( * ) AS language_files 
             FROM repo_labor 
             WHERE repo_id = XXXX ;
         """)
