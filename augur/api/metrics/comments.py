@@ -31,24 +31,28 @@ def number_of_comment_lines(repo_group_id, repo_id=None, begin_date=None, end_da
     if repo_id:
         comment_lines_SQL = s.sql.text(
             """
-        SELECT SUM(total_lines) AS nr_total_lines, SUM(code_lines) AS nr_code_lines, SUM(comment_lines) AS nr_comment_lines,
+        SELECT date(rl_analysis_date), SUM(total_lines) AS nr_total_lines, SUM(code_lines) AS nr_code_lines, SUM(comment_lines) AS nr_comment_lines,
             (SUM(code_lines) * 100 / NULLIF(CAST(SUM(total_lines) AS FLOAT), 0)) AS Percentage_of_code_lines, 
             (SUM(comment_lines) * 100 / NULLIF(CAST(SUM(total_lines) AS FLOAT), 0)) AS Percentage_of_comment_lines  
         FROM repo_labor
-        WHERE repo_id = 1
-            AND rl_analysis_date BETWEEN '1970-1-1 00:00:01' AND '2022-06-06 00:00:01';
+        WHERE repo_id = :repo_id
+            AND rl_analysis_date BETWEEN :begin_date AND :end_date
+        GROUP BY date(rl_analysis_date)
+        ORDER BY date(rl_analysis_date);
+
             """
         )
     else:
         comment_lines_SQL = s.sql.text(
             """
-         SELECT SUM(total_lines) AS nr_total_lines, SUM(code_lines) AS nr_code_lines, SUM(comment_lines) AS nr_comment_lines,
-        (SUM(code_lines) * 100 / NULLIF(CAST(SUM(total_lines) AS FLOAT), 0)) AS Percentage_of_code_lines, 
-        (SUM(comment_lines) * 100 / NULLIF(CAST(SUM(total_lines) AS FLOAT), 0)) AS Percentage_of_comment_lines  
-            FROM repo_labor AS A, repo AS B 
-            WHERE A.repo_id = B.repo_id
-                AND B.repo_group_id = :repo_group_id
-                AND rl_analysis_date BETWEEN :begin_date AND :end_date;           
+        SELECT date(rl_analysis_date), SUM(total_lines) AS nr_total_lines, SUM(code_lines) AS nr_code_lines, SUM(comment_lines) AS nr_comment_lines,
+        (SUM(code_lines) * 100 / NULLIF(CAST(SUM(total_lines) AS FLOAT), 0)) AS Percentage_of_code_lines, (SUM(comment_lines) * 100 / NULLIF(CAST(SUM(total_lines) AS FLOAT), 0)) AS Percentage_of_comment_lines  
+            FROM repo_labor, repo 
+            WHERE repo_labor.repo_id = repo.repo_id
+            AND repo_group_id = :repo_group_id
+        AND rl_analysis_date BETWEEN :begin_date AND :end_date
+        GROUP BY date(rl_analysis_date)
+        ORDER BY date(rl_analysis_date);     
             """
         )
 
