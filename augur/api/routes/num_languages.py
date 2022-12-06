@@ -2,7 +2,7 @@ def create_routes(app):
 
     @app.route('/{}/languages'.format(AUGUR_API_VERSION), methods=["GET"])
     def num_languages():
-      num_of_languages_sql = s.sql.text("""
+        num_of_languages_sql = s.sql.text("""
             SELECT COUNT ( DISTINCT programming_language ) AS "Number of Languages"
             FROM repo_labor 
             WHERE repo_id = XXXX ;
