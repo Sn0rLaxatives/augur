@@ -13,7 +13,7 @@ from augur.api.server import server
 
 AUGUR_API_VERSION = 'api/unstable'
 
-def create_routes(app):
+def create_routes(server):
 
     @app.route('/{}/languages'.format(AUGUR_API_VERSION), methods=["GET"])
     def num_languages(repo_id=None):
