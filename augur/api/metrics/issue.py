@@ -1061,3 +1061,47 @@ def abandoned_issues(repo_group_id, repo_id=None, period='day', begin_date=None,
     results = pd.read_sql(abandonedSQL, engine, params={'repo_id': repo_id, 'repo_group_id': repo_group_id, 'period': period,
                                                                  'begin_date': begin_date, 'end_date': end_date})
     return results
+
+@register_metric()
+def issues_comments_total(repo_group_id, repo_id=None):
+    """Returns total number of issues with comments
+
+    :param repo_group_id: The repository's repo_group_id
+    :param repo_id: The repository's repo_id, defaults to None
+    :return: DataFrame number of total issues with comments
+    """
+
+    if not repo_id:
+        issues_comments_SQL = s.sql.text("""
+                SELECT
+                    i.repo_id,
+                    COUNT(*) AS total
+                FROM issues i, issue_message_ref im
+                WHERE i.issue_id = im.issue_id
+                AND i.pull_request IS NULL 
+                AND i.repo_id IN
+                    (SELECT repo_id FROM repo
+                     WHERE  repo_group_id = :repo_group_id)
+                GROUP BY i.repo_id
+                ORDER BY i.repo_id
+            """)
+
+        results = pd.read_sql(issues_comments_SQL, engine, params={'repo_group_id': repo_group_id})
+
+        return results
+
+    else:
+        issues_comments_SQL= s.sql.text("""
+                SELECT
+                    i.repo_id,
+                    COUNT(*) AS total
+                FROM issues i, issue_message_ref im
+                WHERE i.issue_id = im.issue_id
+                AND i.pull_request IS NULL 
+                AND i.repo_id = :repo_id
+                GROUP BY i.repo_id
+                ORDER BY i.repo_id
+            """)
+
+        results = pd.read_sql(issues_comments_SQL, engine, params={'repo_id': repo_id})
+        return results
