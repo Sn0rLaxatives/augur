@@ -15,7 +15,7 @@ AUGUR_API_VERSION = 'api/unstable'
 
 def create_routes(server):
 
-    @app.route('/{}/languages'.format(AUGUR_API_VERSION), methods=["GET"])
+    @server.app.route('/{}/languages'.format(AUGUR_API_VERSION), methods=["GET"])
     def num_languages(repo_id=None):
         num_of_languages_sql = ""
         if repo_id is None:
