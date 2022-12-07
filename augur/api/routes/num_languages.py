@@ -1,3 +1,18 @@
+#SPDX-License-Identifier: MIT
+import base64
+import sqlalchemy as s
+import pandas as pd
+import json
+from flask import Response
+
+from augur.api.metrics.repo_meta import license_files
+from augur.api.metrics.insight import top_insights
+
+# from augur.api.server import transform
+from augur.api.server import server
+
+AUGUR_API_VERSION = 'api/unstable'
+
 def create_routes(app):
 
     @app.route('/{}/languages'.format(AUGUR_API_VERSION), methods=["GET"])
