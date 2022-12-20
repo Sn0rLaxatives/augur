@@ -1,0 +1,6 @@
+Since the necessary data is not yet in the augur database we implemented the number-of-downloads endpoint as far as we could.
+This means we created a new standard-metric for this endpoint, but only wrote a simple sql-query that should resemble the final sql-query.
+Therefore the necessary remaining steps to finish this endpoint would be:
+1. Collect the necessary download-data and add it to the database.
+2. Revise the sql statement and test the new query on the database.
+3. Test the endpoint
